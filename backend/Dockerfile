@@ -16,15 +16,6 @@ COPY --from=builder /install /usr/local
 
 COPY . .
 
-ENV DJANGO_SECRET_KEY=insecure-dev-key-change-me \
-    DJANGO_DEBUG=False \
-    DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1 \
-    POSTGRES_DB=conduit \
-    POSTGRES_USER=conduit \
-    POSTGRES_PASSWORD=conduit \
-    POSTGRES_HOST=database \
-    POSTGRES_PORT=5432
-
 RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
