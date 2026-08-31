@@ -13,8 +13,6 @@
 
 ### Prerequisites
 
-Make sure the following tools are installed on your machine.
-
 1. Install Docker.
 2. Install Docker Compose (bundled with Docker Desktop on Windows and macOS).
 
@@ -22,9 +20,19 @@ Make sure the following tools are installed on your machine.
 
 1. Clone this repository.
 2. Navigate into the project root folder.
-3. Copy the example environment file: `cp .env.example .env`
+3. Copy the example environment file:
+
+```bash
+   cp .env.example .env
+```
+
 4. Open `.env` and fill in your own values (see [Environment Variables](#environment-variables)).
-5. Build and start all services: `docker compose up --build -d`
+5. Build and start all services:
+
+```bash
+   docker compose up --build -d
+```
+
 6. Open the application in your browser at `http://localhost:8282`.
 
 ## Project Goal
@@ -47,7 +55,11 @@ The frontend Dockerfile also uses a multi stage build. The builder stage install
 
 ### Database
 
-PostgreSQL data is persisted in a named Docker volume, so content survives container restarts. If you change `POSTGRES_PASSWORD` in your `.env` file after the database volume has already been created, the new password will not be picked up automatically. In that case, either reset the volume with `docker compose down -v` (this deletes all data) or update the password directly inside the running database.
+PostgreSQL data is persisted in a named Docker volume, so content survives container restarts. If you change `POSTGRES_PASSWORD` in your `.env` file after the database volume has already been created, the new password will not be picked up automatically. In that case, either reset the volume with the command below (this deletes all data) or update the password directly inside the running database.
+
+```bash
+docker compose down -v
+```
 
 ### Restart behavior
 
@@ -55,7 +67,17 @@ All three services are configured with `restart: unless-stopped`. If the main pr
 
 ### Logs
 
-View logs for a running service with `docker compose logs backend` (or `frontend`, or `database`). Save logs to a file for later use with `docker compose logs backend > backend-logs.txt`.
+View logs for a running service:
+
+```bash
+docker compose logs backend
+```
+
+Save logs to a file for later use:
+
+```bash
+docker compose logs backend > backend-logs.txt
+```
 
 ## Features
 

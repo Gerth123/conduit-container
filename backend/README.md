@@ -21,11 +21,30 @@ This service is intended to be run as part of the full stack through the root `d
 
 To build and run only the backend in isolation for development or debugging:
 
-1. Navigate into this folder: `cd backend`.
-2. Copy the example environment file: `cp .env.example .env`.
+1. Navigate into this folder:
+
+```bash
+   cd backend
+```
+
+2. Copy the example environment file:
+
+```bash
+   cp .env.example .env
+```
+
 3. Open `.env` and fill in your own values.
-4. Build the image: `docker build -t conduit-backend .`.
-5. Run the container: `docker run -p 8000:8000 --env-file .env conduit-backend`.
+4. Build the image:
+
+```bash
+   docker build -t conduit-backend .
+```
+
+5. Run the container:
+
+```bash
+   docker run -p 8000:8000 --env-file .env conduit-backend
+```
 
 ## Project Goal
 
@@ -37,7 +56,13 @@ The codebase runs on Django 1.10.5, a legacy release chosen to reflect a real wo
 
 The Dockerfile uses a multi stage build. The builder stage installs Python dependencies and applies the compatibility patches. The runtime stage copies only the installed packages and application code, keeping the final image small.
 
-On container start, database migrations run automatically before the Gunicorn WSGI server starts. Static files, including the Django admin panel assets, are served through Whitenoise.
+On container start, database migrations run automatically before the Gunicorn WSGI server starts:
+
+```bash
+python manage.py migrate --noinput && gunicorn conduit.wsgi:application --bind 0.0.0.0:8000
+```
+
+Static files, including the Django admin panel assets, are served through Whitenoise.
 
 Configuration is handled entirely through environment variables, so no code changes are needed to adjust settings such as the allowed hosts, CORS origins, or database connection. See [Environment Variables](#environment-variables) below.
 

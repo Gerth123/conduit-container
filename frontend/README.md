@@ -20,9 +20,24 @@ This service is intended to be run as part of the full stack through the root `d
 
 To build and run only the frontend in isolation for development or debugging:
 
-1. Navigate into this folder: `cd frontend`.
-2. Build the image, pointing it to a running backend: `docker build --build-arg API_URL=http://localhost:8000/api -t conduit-frontend .`.
-3. Run the container: `docker run -p 8282:80 conduit-frontend`.
+1. Navigate into this folder:
+
+```bash
+   cd frontend
+```
+
+2. Build the image, pointing it to a running backend:
+
+```bash
+   docker build --build-arg API_URL=http://localhost:8000/api -t conduit-frontend .
+```
+
+3. Run the container:
+
+```bash
+   docker run -p 8282:80 conduit-frontend
+```
+
 4. Open the application in your browser at `http://localhost:8282`.
 
 ## Project Goal
