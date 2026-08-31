@@ -77,3 +77,20 @@ if old_new_class_block not in base_content:
 base_content = base_content.replace(old_new_class_block, new_new_class_block)
 base_path.write_text(base_content)
 print(f"Patched {base_path}")
+pg_utils_path = site_packages / "django" / "db" / "backends" / "postgresql" / "utils.py"
+pg_utils_content = pg_utils_path.read_text()
+
+old_utc_tzinfo_factory = '''def utc_tzinfo_factory(offset):
+    if offset != 0:
+        raise AssertionError("database connection isn't set to UTC")
+    return utc'''
+
+new_utc_tzinfo_factory = '''def utc_tzinfo_factory(offset):
+    return utc'''
+
+if old_utc_tzinfo_factory not in pg_utils_content:
+    raise SystemExit("ERROR: utc_tzinfo_factory block not found in postgresql/utils.py - Django version may have changed")
+
+pg_utils_content = pg_utils_content.replace(old_utc_tzinfo_factory, new_utc_tzinfo_factory)
+pg_utils_path.write_text(pg_utils_content)
+print(f"Patched {pg_utils_path}")
