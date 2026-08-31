@@ -1,5 +1,7 @@
 # Conduit Frontend
 
+The Angular client for Conduit, built and served through a multi stage Docker image with Nginx.
+
 ## Table of Contents
 
 1. [Quickstart](#quickstart)

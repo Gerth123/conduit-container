@@ -1,5 +1,7 @@
 # Conduit Backend
 
+The Django REST Framework API for Conduit, containerized and running on a legacy Django version with automated Python 3 compatibility patches.
+
 ## Table of Contents
 
 1. [Quickstart](#quickstart)

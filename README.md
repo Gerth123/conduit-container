@@ -1,5 +1,7 @@
 # Conduit Container
 
+A fully containerized full stack social blogging platform, built with a Django REST backend, an Angular frontend, and PostgreSQL, orchestrated through Docker Compose.
+
 ## Table of Contents
 
 1. [Quickstart](#quickstart)
