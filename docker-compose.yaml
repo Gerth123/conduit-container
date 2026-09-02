@@ -15,8 +15,7 @@ services:
       retries: 5
 
   backend:
-    build:
-      context: ./backend
+    image: ghcr.io/gerth123/conduit-backend:latest
     restart: unless-stopped
     depends_on:
       database:
@@ -37,10 +36,7 @@ services:
       - backend_static:/app/staticfiles
 
   frontend:
-    build:
-      context: ./frontend
-      args:
-        API_URL: ${API_URL}
+    image: ghcr.io/gerth123/conduit-frontend:latest
     restart: unless-stopped
     depends_on:
       - backend
