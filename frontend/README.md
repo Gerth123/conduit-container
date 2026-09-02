@@ -1,74 +1,65 @@
-[![RealWorld Frontend](https://img.shields.io/badge/realworld-frontend-%23783578.svg)](http://realworld.io)
-[![Build Status](https://travis-ci.org/gothinkster/angular-realworld-example-app.svg?branch=master)](https://travis-ci.org/gothinkster/angular-realworld-example-app)
+# Conduit Frontend
 
-# ![Angular Example App](logo.png)
+The Angular client for Conduit, built and served through a multi stage Docker image with Nginx.
 
-> ### Angular codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) spec and API.
+## Table of Contents
 
-<a href="https://stackblitz.com/edit/angular-realworld" target="_blank"><img width="187" src="https://github.com/gothinkster/realworld/blob/master/media/edit_on_blitz.png?raw=true" /></a>&nbsp;&nbsp;<a href="https://thinkster.io/tutorials/building-real-world-angular-2-apps" target="_blank"><img width="384" src="https://raw.githubusercontent.com/gothinkster/realworld/master/media/learn-btn-hr.png" /></a>
+1. [Quickstart](#quickstart)
+2. [Project Goal](#project-goal)
+3. [Usage](#usage)
+4. [Features](#features)
 
-### [Demo](https://angular.realworld.io)&nbsp;&nbsp;&nbsp;&nbsp;[RealWorld](https://github.com/gothinkster/realworld)
+## Quickstart
 
-This codebase was created to demonstrate a fully fledged application built with Angular that interacts with an actual backend server including CRUD operations, authentication, routing, pagination, and more. We've gone to great lengths to adhere to the [Angular Styleguide](https://angular.io/styleguide) & best practices.
+### Prerequisites
 
-Additionally, there is an Angular 1.5 version of this codebase that you can [fork](https://github.com/gothinkster/angularjs-realworld-example-app) and/or [learn how to recreate](https://thinkster.io/angularjs-es6-tutorial).
+1. Install Docker.
+2. Install Docker Compose.
 
-# How it works
+### Steps
 
-We're currently working on some docs for the codebase (explaining where functionality is located, how it works, etc) but the codebase should be straightforward to follow as is. We've also released a [step-by-step tutorial w/ screencasts](https://thinkster.io/tutorials/building-real-world-angular-2-apps) that teaches you how to recreate the codebase from scratch.
+This service is intended to be run as part of the full stack through the root `docker-compose.yaml`. See the [root README](../README.md) for the complete setup.
 
-### Making requests to the backend API
+To build and run only the frontend in isolation for development or debugging:
 
-For convenience, we have a live API server running at https://conduit.productionready.io/api for the application to make requests against. You can view [the API spec here](https://github.com/GoThinkster/productionready/blob/master/api) which contains all routes & responses for the server.
+1. Navigate into this folder:
 
-The source code for the backend server (available for Node, Rails and Django) can be found in the [main RealWorld repo](https://github.com/gothinkster/realworld).
+```bash
+   cd frontend
+```
 
-If you want to change the API URL to a local server, simply edit `src/environments/environment.ts` and change `api_url` to the local server's URL (i.e. `localhost:3000/api`). Please note you will probably need to use a proxy in order to avoid Cross-Origin Resource (CORS) issues. (more info: [Proxying to a backend server](https://angular.io/guide/build#proxying-to-a-backend-server) )
+2. Build the image, pointing it to a running backend:
 
-# Getting started
+```bash
+   docker build --build-arg API_URL=http://localhost:8000/api -t conduit-frontend .
+```
 
-Make sure you have the [Angular CLI](https://github.com/angular/angular-cli#installation) installed globally. We use [Yarn](https://yarnpkg.com) to manage the dependencies, so we strongly recommend you to use it. you can install it from [Here](https://yarnpkg.com/en/docs/install), then run `yarn install` to resolve all dependencies (might take a minute).
+3. Run the container:
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+```bash
+   docker run -p 8282:80 conduit-frontend
+```
 
-### Building the project
+4. Open the application in your browser at `http://localhost:8282`.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+## Project Goal
 
-## Functionality overview
+This is the Angular frontend for the Conduit application, a full stack social blogging platform (a Medium.com clone) that adheres to the [RealWorld](https://github.com/gothinkster/realworld) spec and API. It communicates with the Django REST backend for authentication, articles, comments, profiles, and tags.
 
-The example application is a social blogging site (i.e. a Medium.com clone) called "Conduit". It uses a custom API for all requests, including authentication. You can view a live demo over at https://angular.realworld.io
+## Usage
 
-**General functionality:**
+The Dockerfile uses a multi stage build. The builder stage installs the npm dependencies and compiles a production Angular bundle. The backend API URL is not hardcoded in the source code. Instead, it is injected at build time through the `API_URL` Docker build argument, which overwrites `src/environments/environment.prod.ts` before the build runs. This keeps the backend address out of the repository, since it can differ between local development and a deployed environment.
 
-- Authenticate users via JWT (login/signup pages + logout button on settings page)
-- CRU\* users (sign up & settings page - no deleting required)
-- CRUD Articles
-- CR\*D Comments on articles (no updating required)
-- GET and display paginated lists of articles
-- Favorite articles
-- Follow other users
+The runtime stage serves the compiled application through an Nginx image. A custom `nginx.conf` is included so that all unmatched routes fall back to `index.html`, which is required for Angular's client side routing to work correctly (for example, reloading the page on `/register` or `/settings` directly).
 
-**The general page breakdown looks like this:**
+Authentication uses a JWT token, stored in the browser's local storage after login or registration. The token is attached automatically to subsequent API requests.
 
-- Home page (URL: /#/ )
-  - List of tags
-  - List of articles pulled from either Feed, Global, or by Tag
-  - Pagination for list of articles
-- Sign in/Sign up pages (URL: /#/login, /#/register )
-  - Uses JWT (store the token in localStorage)
-  - Authentication can be easily switched to session/cookie based
-- Settings page (URL: /#/settings )
-- Editor page to create/edit articles (URL: /#/editor, /#/editor/article-slug-here )
-- Article page (URL: /#/article/article-slug-here )
-  - Delete article button (only shown to article's author)
-  - Render markdown from server client side
-  - Comments section at bottom of page
-  - Delete comment button (only shown to comment's author)
-- Profile page (URL: /#/profile/:username, /#/profile/:username/favorites )
-  - Show basic user info
-  - List of articles populated from author's created articles or author's favorited articles
+## Features
 
-<br />
-
-[![Brought to you by Thinkster](https://raw.githubusercontent.com/gothinkster/realworld/master/media/end.png)](https://thinkster.io)
+- User registration, login, and logout via JWT authentication.
+- Article creation, editing, and deletion, with Markdown rendered client side.
+- Commenting on articles, including deleting your own comments.
+- Favoriting articles and following other users.
+- Global feed, personalized feed (articles from followed authors), and tag based filtering, all paginated.
+- Profile pages showing a user's articles or their favorited articles.
+- Settings page for updating username, bio, email, password, and profile picture.
