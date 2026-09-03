@@ -52,7 +52,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "docker-compose.yaml"
-          target: "~/conduit-deployment"
+          target: "~/projects/conduit-deployment"
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -61,6 +61,6 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ~/conduit-deployment
+            cd ~/projects/conduit-deployment
             docker compose pull
             docker compose up -d
