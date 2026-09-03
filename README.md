@@ -1,6 +1,6 @@
 # Conduit Container
 
-A fully containerized full stack social blogging platform, built with a Django REST backend, an Angular frontend, and PostgreSQL, orchestrated through Docker Compose.
+A fully containerized full stack social blogging platform, built with a Django REST backend, an Angular frontend, and PostgreSQL, orchestrated through Docker Compose and deployed automatically through a GitHub Actions CI/CD pipeline.
 
 ## Table of Contents
 
@@ -41,7 +41,9 @@ A fully containerized full stack social blogging platform, built with a Django R
 
 This repository contains a containerized version of the Conduit application, a full stack social blogging platform (a Medium.com clone) built with a Django REST backend and an Angular frontend. The application is orchestrated with Docker Compose and runs three services: a PostgreSQL database, the Django backend served through Gunicorn, and the Angular frontend served through Nginx.
 
-The purpose of this project is to demonstrate containerizing a legacy application that was not originally built with Docker in mind. The backend runs on Django 1.10.5, a version that predates several Python compatibility mechanisms, so the container build applies automated compatibility patches during the build process.
+The purpose of this project is to demonstrate containerizing a legacy application that was not originally built with Docker in mind, and automating its release process. The backend runs on Django 1.10.5, a version that predates several Python compatibility mechanisms, so the container build applies automated compatibility patches during the build process.
+
+A GitHub Actions workflow builds the backend and frontend images, publishes them to the GitHub Container Registry (GHCR), and deploys the updated `docker-compose.yaml` to a remote Cloud VM over SSH. The build never happens on the target server, only prebuilt images are pulled and started there.
 
 ## Usage
 
@@ -66,6 +68,24 @@ docker compose down -v
 ### Restart behavior
 
 All three services are configured with `restart: unless-stopped`. If the main process inside a container is terminated unexpectedly, Docker restarts the container automatically.
+
+### Continuous Deployment
+
+The `.github/workflows/deployment.yaml` workflow runs on every push to `main` (and can also be triggered manually) and consists of two jobs:
+
+1. `build-and-push` builds the backend and frontend images and pushes them to `ghcr.io/gerth123/conduit-backend` and `ghcr.io/gerth123/conduit-frontend`. The frontend build receives `API_URL` as a build argument so the deployed frontend points to the correct backend address.
+2. `deploy` copies `docker-compose.yaml` to the target VM over SCP, then opens an SSH connection and runs `docker compose pull` followed by `docker compose up -d`, so the containers are updated in detached mode without ever building on the server itself.
+
+The workflow requires the following repository secrets to be configured under `Settings > Secrets and variables > Actions`:
+
+| Secret | Description |
+|---|---|
+| `SSH_HOST` | IP address or hostname of the deployment target VM. |
+| `SSH_USER` | SSH username used to connect to the VM. |
+| `SSH_PRIVATE_KEY` | Private key matching a public key added to the VM's `authorized_keys`. |
+| `API_URL` | Backend API URL baked into the frontend at build time, for example `http://<vm-ip>:8001/api`. |
+
+The runtime `.env` file with database credentials and the Django secret key is kept only on the VM, in the same directory as `docker-compose.yaml`, and is never committed to the repository or passed through the workflow.
 
 ### Logs
 
@@ -102,7 +122,7 @@ docker compose logs backend > backend-logs.txt
 | `POSTGRES_DB` | Name of the PostgreSQL database. | `conduit` |
 | `POSTGRES_USER` | PostgreSQL username. | `conduit` |
 | `POSTGRES_PASSWORD` | PostgreSQL password. | `change-me` |
-| `API_URL` | Backend API URL baked into the Angular frontend at build time. | `http://localhost:8000/api` |
+| `API_URL` | Backend API URL baked into the Angular frontend at build time. | `http://<vm-ip>:8001/api` |
 
 ## Known Issues
 
