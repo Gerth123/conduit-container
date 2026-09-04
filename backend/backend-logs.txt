@@ -1,8 +1,0 @@
-Operations to perform:
-  Apply all migrations: admin, articles, auth, authentication, contenttypes, profiles, sessions
-Running migrations:
-  No migrations to apply.
-Operations to perform:
-  Apply all migrations: admin, articles, auth, authentication, contenttypes, profiles, sessions
-Running migrations:
-  No migrations to apply.

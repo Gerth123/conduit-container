@@ -15,8 +15,7 @@ services:
       retries: 5
 
   backend:
-    build:
-      context: ./backend
+    image: ghcr.io/gerth123/conduit-backend:latest
     restart: unless-stopped
     depends_on:
       database:
@@ -32,15 +31,12 @@ services:
       POSTGRES_HOST: database
       POSTGRES_PORT: 5432
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT}:8000"
     volumes:
       - backend_static:/app/staticfiles
 
   frontend:
-    build:
-      context: ./frontend
-      args:
-        API_URL: ${API_URL}
+    image: ghcr.io/gerth123/conduit-frontend:latest
     restart: unless-stopped
     depends_on:
       - backend
